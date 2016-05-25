@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>A presentation of what append after the render tree</title>
+
+    <meta name="description" content="A presentation of what append after the render tree">
+    <meta name="author" content="Freddy Harris">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <style>
+      @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=latin,latin-ext);
+      body {
+        background: #F4F4F4;
+        background-color: #F4F4F4;
+      }
+      .reveal ul {
+        list-style: circle;
+      }
+      .reveal a:not(.image) {
+        color: #EA5C45;
+      }
+      .reveal a:not(.image):hover {
+        color: #EA5C45;
+        opacity: 0.7;
+      }
+      .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+        color: #39414C;
+        font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+        letter-spacing: 0em;
+      }
+      .reveal {
+        color: #858585;
+        font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+      }
+      .reveal p {
+        font-weight: 300;
+      }
+      .reveal .progress{
+        height: 4px;
+      }
+      .reveal .progress span{
+        background: #EA5C45;
+      }
+      .reveal blockquote {
+        background-clip: padding-box;
+        box-shadow: inset 0 -4px 0 #EA5C45;
+        background-color: #39414C;
+        border-radius: 5px;
+        color: #FFFFFF;
+        font-weight: 300;
+        letter-spacing: 0.025em;
+        padding: 8px 8px 10px;
+        font-size: 30px;
+      }
+      .reveal .controls {
+        visibility: hidden;
+      }
+      .reveal .controls div.navigate-left,
+      .reveal .controls div.navigate-left.enabled {
+        border-right-color: #EA5C45 !important;
+      }
+      .reveal .controls div.navigate-right,
+      .reveal .controls div.navigate-right.enabled {
+        border-left-color: #EA5C45 !important;
+      }
+      .reveal .controls div.navigate-left:hover,
+      .reveal .controls div.navigate-left.enabled:hover,
+      .reveal .controls div.navigate-right:hover,
+      .reveal .controls div.navigate-right.enabled:hover {
+        opacity: 0.4;
+      }
+      .reveal table {
+        margin: auto;
+      }
+      .reveal .li-divider {
+        list-style: none;
+        margin-top: 10px;
+      }
+
+      .reveal .signature {
+        margin-top: 50px;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        opacity: 0.75;
+      }
+
+      .reveal .signature img{
+        border: none;
+        box-shadow: none;
+        height: 50px;
+        margin-right: 5px;
+      }
+
+    </style>
+
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+
+    <style type="text/css">
+      .reveal ul {
+        margin-bottom: 16px;
+      }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section>
+          <h1>FLIP</h1>
+          <h4>First Last Invert Play</h4>
+          <hr>
+          <p>
+            <a href="http://freddy03h.github.io" target="_blank">Freddy Harris</a> / <a href="http://twitter.com/harrisfreddy" target="_blank">@harrisfreddy</a>
+          </p>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <a href="https://aerotwist.com/blog/flip-your-animations/" target="_blank">
+            <img src="/img/aerotwsit-flip.png" />
+          </a>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <h2><a href="http://freddy03h.github.io/render-presentation" target="_blank">Previously…</a></h2>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <h1 style="text-align:left">
+            <div style="display:inline-block;width:0.8em;height:0.8em;fill:#39414C;stroke:#39414C">
+              <svg style="display:block;transform: scale(0.7);" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 50 62.5" enable-background="new 0 0 50 50" xml:space="preserve"><g><g><path d="M50,50H1V1h49V50z M5,46h41V5H5V46z"/><rect x="16" y="17" width="4" height="31"/><rect x="3" y="14" width="45" height="4"/></g><rect x="17" y="30" width="31" height="4"/></g></svg>
+            </div>
+            Layout<br/>
+            <div style="display:inline-block;width:0.8em;height:0.8em;fill:#39414C;stroke:#39414C">
+              <svg style="display:block" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 100 125" enable-background="new 0 0 100 100" xml:space="preserve"><g><path d="M63.6083,33.3253l-5.6326-4.8058c-0.6924-0.5907-1.3169-1.2565-1.8621-1.9852L45.8148,12.7692   c-0.5551-0.7419-1.6389-0.8195-2.2939-0.1644L20.1917,35.9339c-0.8425,0.8426-0.8693,2.2001-0.0607,3.0754l8.6663,9.3792   c0.47,0.5085-0.2387,1.2413-0.7626,0.7885l-9.7507-8.4251c-0.8801-0.7604-2.1978-0.7124-3.0203,0.11l-1.7855,1.7855   c-0.5367,0.5367-0.5957,1.387-0.1381,1.9927L23.687,58.3359c0.5468,0.7236,1.1719,1.3845,1.8641,1.9705l6.1729,5.226   c0.9782,0.8281,2.4278,0.768,3.334-0.1382L63.7421,36.71C64.6933,35.7587,64.6316,34.1985,63.6083,33.3253z"/><path d="M84.7972,75.308c-7.569-7.4921-19.1168-15.9644-19.1168-15.9644c-2.9304-1.9994-2.2886-4.1873-1.0511-5.4247l6.0219-6.0218   c3.1407-3.1407,3.1407-8.233,0-11.3737c-0.5366-0.5366-1.4066-0.5366-1.9432,0.0001l-33.058,33.0579   c-0.5366,0.5366-0.5366,1.4066,0,1.9432c3.1407,3.1407,8.233,3.1407,11.3737,0l6.0217-6.0218   c1.2375-1.2375,2.9297-2.0137,5.4248,1.0511c0,0,8.4723,11.5479,15.9643,19.1168c2.8564,2.8858,7.5142,2.8937,10.3853,0.0226   h0.0001C87.6908,82.8222,87.683,78.1644,84.7972,75.308z M80.9224,81.7959c-1.027,1.027-2.6921,1.027-3.7191,0   c-1.027-1.027-1.027-2.6921,0-3.7191c1.027-1.027,2.6921-1.027,3.7191,0C81.9494,79.1038,81.9494,80.7689,80.9224,81.7959z"/></g></svg>
+            </div>
+            Paint<br/>
+            <div style="display:inline-block;width:0.8em;height:0.8em;fill:#39414C;stroke:#39414C">
+              <svg style="display:block;transform: scale(1.1);" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 256 256" enable-background="new 0 0 256 256" xml:space="preserve"><path d="M188.156,107.66l35.227-20.34L128,32.245L32.617,87.319l35.228,20.34L32.617,128l35.228,20.34l-35.228,20.34L128,223.755  l95.382-55.074l-35.227-20.34L223.383,128L188.156,107.66z M128,42.638l77.383,44.682L128,132.001L50.616,87.319L128,42.638z   M76.844,112.856L128,142.394l51.156-29.538L205.384,128L128,172.682L50.616,128L76.844,112.856z M205.384,168.681L128,213.362  l-77.384-44.682l26.228-15.144L128,183.074l51.156-29.538L205.384,168.681z"/></svg>
+            </div>
+            Composite
+          </h1>
+        </section>
+
+        <section>
+          <h2>Design constraints</h2>
+          <p>Using only <code>opacity</code> and <code>transform</code> can be frustrating</p>
+        </section>
+
+        <section>
+          <h2>I want to do this !</h2>
+          <p><a href="http://joshwcomeau.github.io/react-flip-move/examples/#/shuffle?_k=dhlery" target="_blank">Example 1</a></p>
+          <p><a href="https://googlechrome.github.io/flipjs/" target="_blank">Example 2</a></p>
+        </section>
+
+        <section>
+          <h2>I want to be able to change the DOM</h2>
+          <h4>I don't want to do all the Layout in JavaScript</h4>
+        </section>
+
+        <section>
+          <h2>Fake Layout Animation</h2>
+        </section>
+
+        <section>
+          <img src="/img/flip-first - copie.png" style="border:none" />
+          <h3>First</h3>
+        </section>
+
+        <section>
+          <img src="/img/flip-last - copie.png" style="border:none;opacity:.4" />
+          <h3>Last</h3>
+        </section>
+
+        <section>
+          <img src="/img/flip-first - copie 2.png" style="border:none" />
+          <h3>Invert</h3>
+        </section>
+
+        <section>
+          <video src="/img/flip-play.mov" autoplay loop style="border:none"></video>
+          <h3>Play</h3>
+        </section>
+
+        <section>
+          <ul>
+            <li><strong>First</strong>: the initial state of the elements</li>
+            <li><strong>Last</strong>: the final state of the elements</li>
+            <li><strong>Invert</strong>: Visually replace elements to their initial positions, as if they hadn't moved, using <code>transform</code> or <code>opacity</code></li>
+            <li><strong>Play</strong>: Animate the change to the final state</li>
+          </ul>
+        </section>
+
+        <section>
+          <pre><code data-trim contenteditable class="javascript">
+// Get the first position.
+var first = el.getBoundingClientRect();
+
+// Move it to the end.
+el.classList.add('totes-at-the-end');
+
+// Get the last position.
+var last = el.getBoundingClientRect();
+
+// Invert.
+var invert = first.top - last.top;
+
+// Go from the inverted position to last.
+var player = el.animate([
+  { transform: 'translateY(' + invert + 'px)' },
+  { transform: 'translateY(0)' }
+], {
+  duration: 300,
+  easing: 'cubic-bezier(0,0,0.32,1)',
+});
+
+// Do any tidy up at the end of the animation.
+player.addEventListener('finish', tidyUpAnimations);
+          </code></pre>
+        </section>
+
+        <section>
+          <h3>By the way…</h3>
+          <p>You told us it's not performant to produce a Layout change. But you did one !</p>
+        </section>
+
+        <section>
+          <img src="/img/window.jpg" />
+          <h4>Taking advantage of user perception</h4>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <h3>Bonus: React</h3>
+          <ul>
+            <li>Calculate <strong>First</strong> on <code>componentWillReceiveProps</code></li>
+            <li>Calculate <strong>Last</strong> on <code>componentDidUpdate</code></li>
+            <li><strong>Invert</strong> the position on <code>componentDidUpdate</code></li>
+            <li><strong>Play</strong> the animation on <code>componentDidUpdate</code></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>React component</h3>
+          <pre><code data-trim contenteditable class="javascript">
+import React from 'react'
+import FlipMove from 'react-flip-move'
+
+const ArticleList = ({articles}) => (
+  &lt;FlipMove&gt;
+    { articles.map( article => &lt;Article key={article.id} {...article} /&gt; ) }
+  &lt;/FlipMove&gt;
+);
+          </code></pre>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <h2>References</h2>
+          <ul>
+            <li class="li-divider">Articles</li>
+            <li><a href="https://aerotwist.com/blog/flip-your-animations/" target="_blank">FLIP Your Animations</a></li>
+            <li><a href="https://medium.com/developers-writing/animating-the-unanimatable-1346a5aab3cd#.7a0hhecpw" target="_blank">Animating the Unanimatable. Smooth reordering transitions in React.js</a></li>
+
+            <li class="li-divider">Talks</li>
+            <li><a href="https://www.youtube.com/watch?v=RCFQu0hK6bU" target="_blank">The Applied Science of Runtime Performance</a></li>
+            <li><a href="https://www.youtube.com/watch?v=thNyy5eYfbc" target="_blank">High performance web user interfaces</a></li>
+
+            <li class="li-divider">Tools</li>
+            <li><a href="https://github.com/joshwcomeau/react-flip-move" target="_blank">react-flip-move</a></li>
+
+            <li class="li-divider">Others</li>
+            <li><a href="http://csstriggers.com/" target="_blank">CSS Triggers</a></li>
+            <li><a href="http://jankfree.org/" target="_blank">Jank Free</a></li>
+
+          </ul>
+        </section>
+
+        <!-- |||| -->
+
+        <section>
+          <h2>Merci</h2>
+
+          <div class="signature">
+            <img src="img/twitter.png">
+            <a href="http://twitter.com/harrisfreddy" target="_blank">@harrisfreddy</a>
+          </div>
+
+          <p style="margin-top:30px;">Freelance Front-end</p>
+          <p><small>React.js • Mobile First • Hybrid & Progressive Web Apps</small></p>
+        </section>
+
+      </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.min.js"></script>
+
+    <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        theme: 'solarized', // available themes are in /css/theme
+        transition: 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Parallax scrolling
+        // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+        // parallaxBackgroundSize: '2100px 900px',
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>
